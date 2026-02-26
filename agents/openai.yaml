@@ -1,0 +1,4 @@
+interface:
+  display_name: "Hive Spark SQL Optimizer"
+  short_description: "Review and optimize Hive + Spark SQL"
+  default_prompt: "Review and rewrite this Hive/Spark SQL for correctness, readability, and performance."
