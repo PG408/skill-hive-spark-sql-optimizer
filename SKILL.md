@@ -15,7 +15,8 @@ Prioritize decisions in this order: correctness, explainability, performance gai
 Read only what is needed:
 - Use `references/rules.md` for baseline rules and gating.
 - Use `references/patterns.md` for anti-pattern rewrites.
-- Use `references/output-template.md` for fixed response format.
+- Use `references/output-template.md` for the default concise report format.
+- Use `references/output-template-full.md` only when the user explicitly requests a detailed report.
 
 ## Workflow
 
@@ -26,7 +27,21 @@ Read only what is needed:
 5. Generate a main rewrite candidate.
 6. Generate one backup candidate when complexity is high.
 7. Apply risk/benefit gate before allowing medium/high-risk changes.
-8. Output results with the fixed template.
+8. Route output mode and render results with the corresponding template.
+
+## Output Mode Routing
+
+Default mode:
+- Always use concise mode unless the user explicitly requests detailed output.
+- Concise mode must use `references/output-template.md`.
+
+Detailed mode triggers:
+- Use detailed mode only when the user clearly asks for "detailed", "full", "verbose", "复杂版", "详细版", or equivalent wording.
+- Detailed mode must use `references/output-template-full.md`.
+
+Conflict handling:
+- If user intent is ambiguous, keep concise mode by default.
+- If user explicitly asks for both speed and full detail, prioritize user-stated detail requirement.
 
 ## Complexity Rules
 
@@ -54,30 +69,22 @@ Use this decision priority:
 3. Performance gain third.
 4. Rewrite aggressiveness fourth.
 
-## Rewrite Requirements
+## Hard Constraints (Summary)
 
-For every accepted rewrite:
-- Provide `Before SQL` and `After SQL`.
-- Map each change to rationale, expected gain, and risk level.
-- Attach validation steps based on `EXPLAIN` and result reconciliation.
-- State assumptions explicitly.
+- Keep correctness as the first priority in all rewrite decisions.
+- Apply the risk gate defined in `## Risk and Benefit Gate`; keep conservative or suggestion-only output when the gate is not met.
+- Never write Spark configuration into SQL or code; provide Spark tuning as optional environment recommendations only.
+- Always use concise output by default with `references/output-template.md`.
+- Switch to `references/output-template-full.md` only when the user explicitly requests detailed output.
+- For detailed rewrite rules (correctness, logic, performance, readability), follow `references/rules.md` as the single source of truth.
+- For anti-pattern conversion strategies, follow `references/patterns.md`.
 
-## Spark Parameter Rule
+## Maintenance Convention
 
-Never write Spark configuration into SQL or code in this workflow.
-Only provide Spark tuning as optional environment suggestions.
-
-## Output Contract
-
-Always format results by following `references/output-template.md`.
-Never skip these sections:
-- SQL type and complexity.
-- Findings by category.
-- Rewritten SQL.
-- Rationale and expected gains.
-- Risk summary and gating result.
-- Validation steps.
-- Optional Spark environment suggestions.
+- `SKILL.md` owns workflow, complexity routing, and hard-constraint summaries only.
+- `references/rules.md` owns detailed rewrite conventions and style/performance rules.
+- `references/patterns.md` owns anti-pattern rewrite strategies.
+- When detailed rule text changes, update reference files first and keep `SKILL.md` summary-level to avoid duplication drift.
 
 ## Trigger Examples
 

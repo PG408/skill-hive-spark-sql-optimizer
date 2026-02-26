@@ -1,11 +1,18 @@
 # Hive + Spark 3.2 SQL Rules
 
 ## Table of Contents
+- Company Rules and Conventions
 - Correctness Rules
 - Logic Rules
 - Performance Rules
 - Readability Rules
 - Risk-Gating Rules
+
+## Company Rules and Conventions
+
+1. `${DATE}` is a date string in `YYYY-MM-DD` format.
+2. `${date}` is a date string in `YYYYMMDD` format.
+3. Table partitions use `${date}` format, while `activation_date` uses `${DATE}` format.
 
 ## Correctness Rules
 
@@ -49,6 +56,11 @@
 4. Use semantic aliases (for example, `fact_orders`, `dim_user`) instead of `a`, `b`, `c`.
 5. Keep CTE order aligned with transformation flow.
 6. Keep comments concise and only for non-obvious logic.
+7. Prefer `IF` for simple binary branching; use `CASE WHEN` for multi-branch logic or when it is materially clearer.
+8. Keep CTE count minimal; avoid single-use pass-through CTEs without semantic value.
+9. Remove unused columns and redundant projections as early as possible.
+10. Use `AS` when aliasing tables or columns is needed for clarity or disambiguation.
+11. Prefer shorthand type conversion like `int(expr)` and `string(expr)` when supported; use `CAST` only if shorthand is unavailable or harms clarity.
 
 ## Risk-Gating Rules
 
