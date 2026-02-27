@@ -27,7 +27,8 @@ Read only what is needed:
 5. Generate a main rewrite candidate.
 6. Generate one backup candidate when complexity is high.
 7. Apply risk/benefit gate before allowing medium/high-risk changes.
-8. Route output mode and render results with the corresponding template.
+8. Extract rewrite deltas and classify every change as major or minor.
+9. Route output mode and render results with the corresponding template.
 
 ## Output Mode Routing
 
@@ -42,6 +43,27 @@ Detailed mode triggers:
 Conflict handling:
 - If user intent is ambiguous, keep concise mode by default.
 - If user explicitly asks for both speed and full detail, prioritize user-stated detail requirement.
+
+## Rewrite Visibility Routing
+
+Default rules:
+- Use shared change identifiers across report and SQL: `M01...` for major rewrites, `S01...` for minor rewrites.
+- Ensure every physical rewrite appears at least once in either the major rewrite map or SQL inline comments.
+
+Major rewrite triggers (any one is enough):
+- Semantic risk score is `>= 2`.
+- Expected gain is `>= 20%`.
+- Structural rewrite exists (join/aggregation/window/union/dedup/CTE responsibility re-layout).
+
+Minor rewrite rendering:
+- Any rewrite not classified as major is minor by default.
+- Render minor rewrites as inline SQL comments before changed snippets:
+  - `-- [Sxx] <中文短句：改动点 + 目的>`
+- Keep each minor rewrite comment to one sentence.
+
+No-major handling:
+- If no major rewrite exists and no proposal-level major plan is needed, omit the `Major Rewrite Map` section.
+- In `Rewrite Visibility Summary`, explicitly state why no major rewrite was triggered.
 
 ## Complexity Rules
 
@@ -76,6 +98,7 @@ Use this decision priority:
 - Never write Spark configuration into SQL or code; provide Spark tuning as optional environment recommendations only.
 - Always use concise output by default with `references/output-template.md`.
 - Switch to `references/output-template-full.md` only when the user explicitly requests detailed output.
+- Make rewrites traceable: the report and SQL must expose `change_id` mapping for all material edits.
 - For detailed rewrite rules (correctness, logic, performance, readability), follow `references/rules.md` as the single source of truth.
 - For anti-pattern conversion strategies, follow `references/patterns.md`.
 

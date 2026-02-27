@@ -6,6 +6,7 @@
 - Logic Rules
 - Performance Rules
 - Readability Rules
+- Rewrite Visibility Rules
 - Risk-Gating Rules
 
 ## Company Rules and Conventions
@@ -61,6 +62,27 @@
 9. Remove unused columns and redundant projections as early as possible.
 10. Use `AS` when aliasing tables or columns is needed for clarity or disambiguation.
 11. Prefer shorthand type conversion like `int(expr)` and `string(expr)` when supported; use `CAST` only if shorthand is unavailable or harms clarity.
+
+## Rewrite Visibility Rules
+
+1. Extract rewrite units at expression/predicate/window/join/CTE-responsibility granularity.
+2. Assign unique identifiers to all units:
+- Major rewrites use `M01`, `M02`, ...
+- Minor rewrites use `S01`, `S02`, ...
+3. Classify rewrite units in strict order:
+   - If structural rewrite exists (join/aggregation/window/union/dedup/CTE responsibility re-layout), classify as major.
+   - Else if semantic risk score is `>= 2`, classify as major.
+   - Else if expected gain is `>= 20%`, classify as major.
+   - Else classify as minor.
+4. Keep report and SQL traceability aligned:
+- Any major rewrite must appear in `Major Rewrite Map`.
+- Any minor rewrite must be commented in SQL with `-- [Sxx] <中文短句：改动点 + 目的>`.
+5. Minor SQL comments must be one-sentence, pre-change comments and should explain business/execution intent instead of obvious syntax actions.
+6. If no major rewrite exists and no proposal-level major plan is needed, omit `Major Rewrite Map` and explicitly explain the no-major reason in `Rewrite Visibility Summary`.
+7. If risk gate downgrades or rejects aggressive rewrites, still provide a proposal-level major map draft to avoid hidden rewrite intent.
+8. Do not fabricate rewrites:
+- If no material rewrite was applied, use explicit downgrade language and keep change sections minimal.
+- Never create fake `change_id` entries for unchanged logic.
 
 ## Risk-Gating Rules
 

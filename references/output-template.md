@@ -4,8 +4,7 @@ Use this exact section order in concise mode.
 
 Conciseness guardrails:
 - Keep each bullet to one sentence when possible.
-- Provide one key point per findings category by default.
-- Keep SQL code concise and remove dead columns/expressions.
+- Keep SQL concise and annotate only changed minor snippets.
 - Keep optional Spark suggestions to at most two items.
 
 ## 1) SQL Classification
@@ -13,36 +12,51 @@ Conciseness guardrails:
 - Complexity: `simple` / `medium` / `high`
 - Assumptions: list only critical schema/statistics assumptions
 
-## 2) Key Findings
+## 2) Rewrite Visibility Summary
+- Major rewrite count:
+- Minor rewrite count:
+- Major trigger basis:
+- Major map mode: `applied` / `proposal` / `none`
+- No-major reason (required when major count is 0):
+
+## 3) Major Rewrite Map (show when major count > 0, or when gate is downgraded/rejected with major proposal)
+
+| change_id | change_type | location | before | after | reason | expected_gain | risk | validation_hook |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| M01 | | | | | | | | |
+
+## 4) Key Findings
 - Correctness: `issue + fix direction`
 - Logic: `issue + fix direction`
 - Performance: `issue + fix direction`
 - Readability: `issue + fix direction`
 
-## 3) Rewritten SQL
+## 5) Rewritten SQL
 
-### 3.1 After SQL (Main Plan)
+### 5.1 After SQL (Main Plan)
 ```sql
+-- [S01] 中文短句：改动点 + 目的
 -- optimized SQL (main)
 ```
 
-### 3.2 After SQL (Backup Plan, high complexity only)
+### 5.2 After SQL (Backup Plan, high complexity only)
 ```sql
+-- [S01] 中文短句：改动点 + 目的
 -- optimized SQL (backup)
 ```
 
-## 4) Risk Gate Result
+## 6) Risk Gate Result
 - Semantic risk score (0-5):
 - Execution risk score (0-5):
 - Expected gain (%):
 - Gate decision: `pass` / `downgrade` / `reject`
 - Why:
 
-## 5) Validation Checklist
+## 7) Validation Checklist
 - Explain plan check:
 - Key metric reconciliation check:
 - Boundary/date partition check:
 
-## 6) Optional Spark Environment Suggestions
+## 8) Optional Spark Environment Suggestions
 - Keep as recommendations only.
 - Do not write Spark configs into SQL or source code.
