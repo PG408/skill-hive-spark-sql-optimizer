@@ -75,12 +75,13 @@
    - Else if expected gain is `>= 20%`, classify as major.
    - Else classify as minor.
 4. Keep report and SQL traceability aligned:
-- Any major rewrite must appear in `Major Rewrite Map`.
-- Any minor rewrite must be commented in SQL with `-- [Sxx] <中文短句：改动点 + 目的>`.
-5. Minor SQL comments must be one-sentence, pre-change comments and should explain business/execution intent instead of obvious syntax actions.
-6. If no major rewrite exists and no proposal-level major plan is needed, omit `Major Rewrite Map` and explicitly explain the no-major reason in `Rewrite Visibility Summary`.
-7. If risk gate downgrades or rejects aggressive rewrites, still provide a proposal-level major map draft to avoid hidden rewrite intent.
-8. Do not fabricate rewrites:
+- Any major rewrite must appear in report traceability sections (for example, `改了什么`).
+- Any localizable major/minor rewrite must be commented in SQL with `-- [Mxx/Sxx] <中文短句：改动点 + 目的>`.
+5. SQL comments for rewrites must be one-sentence, pre-change comments and should explain business/execution intent instead of obvious syntax actions.
+6. If a rewrite is non-localizable, the report must include reason and coverage scope, and SQL should include a header-level summary marker when feasible.
+7. If no major rewrite exists and no proposal-level major plan is needed, explicitly explain the no-major reason in report traceability sections.
+8. If risk gate downgrades or rejects aggressive rewrites, still provide proposal-level major rewrite traceability to avoid hidden rewrite intent.
+9. Do not fabricate rewrites:
 - If no material rewrite was applied, use explicit downgrade language and keep change sections minimal.
 - Never create fake `change_id` entries for unchanged logic.
 
@@ -98,6 +99,7 @@ Decision policy:
 4. If confidence is low due to missing metadata, downgrade to suggestion-only.
 
 Mandatory output:
+- Report must begin with `TL;DR` (three bullets: major change, expected gain, gate/risk conclusion).
 - Explain why each risky change passed or failed the gate.
 - Include clear rollback guidance for medium/high-risk rewrites.
 - Keep Spark config advice in recommendation text only, never in SQL/code edits.

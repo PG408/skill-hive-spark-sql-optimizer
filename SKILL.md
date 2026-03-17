@@ -34,11 +34,13 @@ Read only what is needed:
 
 Default mode:
 - Always use concise mode unless the user explicitly requests detailed output.
-- Concise mode must use `references/output-template.md`.
+- Concise mode must use `references/output-template.md` (`Concise v2` four-section format).
+- In concise mode, report must begin with a `TL;DR` section before the core sections.
 
 Detailed mode triggers:
 - Use detailed mode only when the user clearly asks for "detailed", "full", "verbose", "复杂版", "详细版", or equivalent wording.
 - Detailed mode must use `references/output-template-full.md`.
+- In detailed mode, report must begin with a `TL;DR` section before the detailed sections.
 
 Conflict handling:
 - If user intent is ambiguous, keep concise mode by default.
@@ -48,22 +50,29 @@ Conflict handling:
 
 Default rules:
 - Use shared change identifiers across report and SQL: `M01...` for major rewrites, `S01...` for minor rewrites.
-- Ensure every physical rewrite appears at least once in either the major rewrite map or SQL inline comments.
+- Ensure every physical rewrite appears at least once in report traceability fields (for example, `改了什么`) or SQL inline comments.
 
 Major rewrite triggers (any one is enough):
 - Semantic risk score is `>= 2`.
 - Expected gain is `>= 20%`.
 - Structural rewrite exists (join/aggregation/window/union/dedup/CTE responsibility re-layout).
 
+Major rewrite rendering:
+- When a major rewrite is localizable, render inline SQL comments before changed snippets:
+  - `-- [Mxx] <中文短句：改动点 + 目的>`
+- When a major rewrite is non-localizable (for example, cross-CTE responsibility re-layout), add a header-level `Mxx` summary comment and explain scope under `改了什么`.
+- Keep each major rewrite comment to one sentence.
+
 Minor rewrite rendering:
 - Any rewrite not classified as major is minor by default.
-- Render minor rewrites as inline SQL comments before changed snippets:
-  - `-- [Sxx] <中文短句：改动点 + 目的>`
+- Render minor rewrites using the same locality-first strategy:
+  - Localizable minor rewrites use inline comments: `-- [Sxx] <中文短句：改动点 + 目的>`
+  - Non-localizable minor rewrites use header-level summary comments and must be explained under `改了什么`
 - Keep each minor rewrite comment to one sentence.
 
 No-major handling:
-- If no major rewrite exists and no proposal-level major plan is needed, omit the `Major Rewrite Map` section.
-- In `Rewrite Visibility Summary`, explicitly state why no major rewrite was triggered.
+- If no major rewrite exists and no proposal-level major plan is needed, state the no-major reason in report traceability fields.
+- In concise mode, place this explanation under `改了什么` or `有什么影响`.
 
 ## Complexity Rules
 
@@ -98,7 +107,8 @@ Use this decision priority:
 - Never write Spark configuration into SQL or code; provide Spark tuning as optional environment recommendations only.
 - Always use concise output by default with `references/output-template.md`.
 - Switch to `references/output-template-full.md` only when the user explicitly requests detailed output.
-- Make rewrites traceable: the report and SQL must expose `change_id` mapping for all material edits.
+- Report output must begin with `TL;DR` and include three non-empty bullets: `主要改动`, `核心收益`, and `风险结论`.
+- Make rewrites traceable: the report and SQL must expose `change_id` mapping for all material edits, even when no standalone major map section is used.
 - For detailed rewrite rules (correctness, logic, performance, readability), follow `references/rules.md` as the single source of truth.
 - For anti-pattern conversion strategies, follow `references/patterns.md`.
 

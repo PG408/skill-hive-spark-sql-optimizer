@@ -1,11 +1,17 @@
 # Output Template (Detailed Mode)
 
 Use this exact section order in detailed mode.
+Section order: `TL;DR` first, then the detailed sections.
 
 Detailed-mode guardrails:
 - Keep each bullet focused and non-redundant.
 - Keep SQL concise even in detailed mode.
 - Keep optional Spark suggestions to at most two items.
+
+## TL;DR
+- 主要改动：
+- 核心收益：
+- 风险结论：
 
 ## 1) SQL Classification
 - Workload: `ETL` or `Analytics`
